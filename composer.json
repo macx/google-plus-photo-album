@@ -1,0 +1,17 @@
+{
+  "name": "macx/google-plus-photo-album",
+  "description": "PHP Class to fetch and cache a specific Google+ Photo Album.",
+  "keywords": ["google+","picasa","php","album","photos"],
+  "homepage": "https://github.com/macx/google-plus-photo-album",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "David Maciejewski",
+      "email": "hello@macx.io"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.3.0"
+  }
+}

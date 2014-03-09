@@ -1,0 +1,8 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:300italic,300);
+
+// Animation
+@mixin animation($params) {
+  -webkit-animation: #{$params};
+     -moz-animation: #{$params};
+          animation: #{$params};
+}

@@ -1,1 +1,7 @@
-/vendor/
+# Ignore Files
+composer.lock
+.DS_Store
+
+# Dependencys
+/node_modules
+/vendor

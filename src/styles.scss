@@ -1,3 +1,5 @@
+@import '_mixins';
+
 *,
 *:before,
 *:after {
@@ -46,11 +48,6 @@ body {
     position: relative;
     margin: 0;
 
-    -webkit-perspective: 1000;
-    -moz-perspective: 1000;
-    -o-perspective: 1000;
-    perspective: 1000;
-    
     img {
       width: 100%;
       height: auto;

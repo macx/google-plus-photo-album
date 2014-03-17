@@ -13,36 +13,53 @@
 
 <?php
 
+// Loading the Class, wherever you have saved it
 require '../GooglePlusPhotoAlbum.php';
 
-$album = new macx\GooglePlus\GooglePlusPhotoAlbum();
-
-// Set your numeric Google+ or Picasa user id (it's the same):
-$album->setUserId('102458928073783517690');
-
-// Set your numeric Album ID:
-$album->setAlbumId('5857194229946030081');
-
-$newZealand = $album->getAlbum();
+// Get Your Album by providing your Google+ or
+// Picasa User ID (it's the same) and the Album ID
+// you want to display
+$album = GooglePlusPhotoAlbum\AlbumFactory::getAlbum(array(
+  'id'     => '5857194229946030081',
+  'userId' => '102458928073783517690'
+));
 
 ?>
 
-<?php if($newZealand && ($newZealand['images']['total'] > 0)): ?>
+<?php if($album && ($album->getImageCount() > 0)): ?>
   <section class="m-gallery">
-    <h1><?php echo $newZealand['title']; ?></h1>
+    <h1><?php echo $album->getTitle(); ?></h1>
 
+    <?php
+
+      $images = $album->getImages();
+
+      foreach($images as $image) {
+        echo 'A';
+      }
+      echo '<pre style="background: orange; color: white;">' . print_r($images, true) . '</pre>';
+      // foreach($images->images as $image) {
+      //   echo 'X';
+      // }
+      #oreach($images->images as $image) {
+       # echo $image->getTitle();
+      #}
+    ?>
     <ul>
-    <?php foreach($newZealand['images']['media'] as $image): ?>
+    <?php foreach($album->getImages() as $image): ?>
       <li>
           <div class="m-gallery__box">
           <figure>
+            <?php
+             /*
             <img src="<?php echo $image['thumbnails']['s200-c']; ?>" srcset="<?php echo $image['thumbnails']['s200-c']; ?> 1x, <?php echo $image['thumbnails']['s400-c']; ?> 2x" alt="<?php echo $image['title']; ?>">
-            <figcaption><?php echo $image['summary']; ?></figcaption>
+            */ ?>
+            <figcaption><?php echo $album->getSummary(); ?></figcaption>
           </figure>
 
           <div>
-            Dimensions: <?php echo $image['width']; ?> x <?php echo $image['height']; ?> Pixel<br>
-            Size: <?php echo $image['size']; ?> bytes<br>
+            Dimensions: <?php echo $image->width; ?> x <?php echo $image->height; ?> Pixel<br>
+            Size: <?php echo $image->size; ?> bytes<br>
             Comments: 0<br>
             Viewed: 0
           </div>

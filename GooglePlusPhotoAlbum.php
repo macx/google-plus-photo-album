@@ -1,14 +1,17 @@
 <?php
 
-namespace macx\GooglePlus;
+namespace GooglePlusPhotoAlbum;
 
-/**
- *
- */
-class GooglePlusPhotoAlbum {
-  protected $userId = false;
+class Album {
+  protected $id;
 
-  protected $albumId = false;
+  protected $userId;
+
+  protected $albumData;
+
+  protected $title;
+
+  protected $images;
 
   protected $imageSchema = 'http://a9.com/-/spec/opensearchrss/1.0/';
 
@@ -19,59 +22,61 @@ class GooglePlusPhotoAlbum {
   /**
    * [__construct description]
    */
-  public function __construct() {
-  }
+  public function __construct($config) {
+    // Prepare user inputs
+    if($this->setIdAndUser($config) === false) {
+      $errorMsg = 'Please provide a valid Album and User ID';
+      trigger_error($errorMsg, E_USER_ERROR);
+    }
 
-  /**
-   * [setUserId description]
-   * @param boolean $userId [description]
-   */
-  public function setUserId($userId = false) {
-    if(($userId !== false) && is_string($userId)) {
-      $this->userId = $userId;
+    try {
+      $this->albumData = $this->getAlbumData();
+    } catch (Exception $e) {
+      throw new Exception('Can\'t get Album', 0, $e);
     }
   }
 
-  /**
-   * [setAlbumId description]
-   * @param boolean $albumId [description]
-   */
-  public function setAlbumId($albumId = false) {
-    if(($albumId !== false) && is_string($albumId)) {
-      $this->albumId = $albumId;
-    }
-  }
+  // public function __call($property, $args) {
+  //   // if(array_key_exists($key, $this->albumData)) {
+  //   //   echo 'FOOBAR';
+  //   // }
+  //   // echo '<pre>' . print_r($args, true) . '</pre>';
+  //   echo "Calling method {$property} / {$args}";
+  // }
 
-  /**
-   * Validate given User and Album Id
-   * @return boolean Valid User and Album Id returns true
-   */
-  private function validateIdentifiers() {
-    // validate user id
-    if(($this->userId === false) || !preg_match('/^([a-z0-9]+)$/', $this->userId)) {
+  // public function __get($property) {
+  //   if(property_exists($this, $property)) {
+  //     return $this->$property;
+  //   }
+
+  //   return false;
+  // }
+
+  private function setIdAndUser($config) {
+    // Filter user inputs, strip HTML
+    $config = filter_var_array($config, array(
+      'id'     => FILTER_SANITIZE_STRING,
+      'userId' => FILTER_SANITIZE_STRING
+    ));
+
+    if(!isset($config['id']) || empty($config['id'])) {
       return false;
     }
 
-    // validate album id
-    if(($this->albumId === false) || !preg_match('/^([0-9]+)$/', $this->albumId)) {
+    if(!isset($config['userId']) || empty($config['userId'])) {
       return false;
     }
+
+    // Passed the validation? Assign them.
+    $this->id     = $config['id'];
+    $this->userId = $config['userId'];
 
     return true;
   }
 
-  /**
-   * [getAlbum description]
-   * @return [type] [description]
-   */
-  public function getAlbum() {
-    if(!$this->validateIdentifiers()) {
-      $errorMsg = 'Please provide a valid User and Album ID';
-      trigger_error($errorMsg, E_USER_ERROR);
-    }
-
+  private function getAlbumData() {
     // build album url
-    $feedUrl = sprintf('http://picasaweb.google.com/data/feed/api/user/%s/albumid/%s?kind=photo&access=public', $this->userId, $this->albumId);
+    $feedUrl = sprintf('http://picasaweb.google.com/data/feed/api/user/%s/albumid/%s?kind=photo&access=public', $this->userId, $this->id);
 
     // read feed data into SimpleXML object
     $sxml = simplexml_load_file($feedUrl);
@@ -107,14 +112,13 @@ class GooglePlusPhotoAlbum {
       );
     }
 
+    // Convert Array to Object for better data handling
+    #$albumObject = json_decode(json_encode($album), false);
+
+    #return (object) $albumObject;
     return $album;
   }
 
-  /**
-   * [getMediaUrls description]
-   * @param  boolean $url [description]
-   * @return [type]       [description]
-   */
   private function getMediaUrls($url = false) {
     $thumbnails = array(
       'origin' => (string) $url
@@ -138,4 +142,61 @@ class GooglePlusPhotoAlbum {
 
     return $thumbnails;
   }
+
+  public function getTitle() {
+    return $this->albumData['title'];
+  }
+
+  public function getImageCount() {
+    return $this->albumData['images']['total'];
+  }
+
+  public function getImages() {
+    $images = new Images($this->albumData['images']);
+
+    return $images->images;
+  }
+
+  public function getImage($index) {
+    #return new Image($this->albumData->images->media[$index]);
+    // return $this->albumData->images->media[$index];
+  }
+
+
+  #echo '<pre style="border: 1px solid red;">' . print_r($album, true) . '</pre>';
 }
+
+// class Image {
+//   private $image;
+//   public functiuon __construct ($image) {
+//     $this->image = $image;
+//   }
+
+//   public function getTitle() {
+//     return $this->image->title;
+//   }
+// }
+//
+
+class Images {
+  private $images;
+
+  public function __construct($images) {
+    $this->images = $images['media'];
+  }
+
+  public function getImage() {
+    echo 'fooobar';
+  }
+}
+
+class Thumbnails {
+
+}
+
+class AlbumFactory {
+  public static function getAlbum($config = false) {
+    return new Album($config);
+  }
+}
+

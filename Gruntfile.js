@@ -31,14 +31,19 @@ module.exports = function (grunt) {
     },
 
     sass: {
-      demo: {
+      build: {
         options: {
-          outputStyle: 'compressed'
+          outputStyle: 'compressed',
+          sourceComments: 'map'
         },
-        files: {
-          '<%= conf.demo %>/styles.css': '<%= conf.src %>/*.scss'
-        },
-      }
+        files: [{
+          expand: true,
+          cwd: '<%= conf.src %>',
+          src: ['**/*.scss'],
+          dest: '<%= conf.demo %>',
+          ext: '.css'
+        }]
+      },
     },
 
     watch: {
@@ -75,8 +80,8 @@ module.exports = function (grunt) {
   // Default task.
   grunt.registerTask('default', function () {
     grunt.task.run([
-      'sass',
-      'jshint'
+      'jshint',
+      'sass'
     ]);
 
     grunt.log.writeln('Run `grunt serve` to start a php server and open the demo.');
